@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      REDIS_URL: db:6379
+       
+    depends_on:
+      - db
+  db:
+      image: redis
+
