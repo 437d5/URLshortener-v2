@@ -8,7 +8,7 @@ import (
 type URL struct{}
 
 func (u *URL) CreateURL(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("create an url")
+	fmt.Println("create url")
 }
 
 func (u *URL) GetURL(w http.ResponseWriter, r *http.Request) {
@@ -19,6 +19,11 @@ func (u *URL) DeleteURL(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("delete the url")
 }
 
-func (u *URL) ShowURLList(w http.ResponseController, r *http.Request) {
+func (u *URL) ShowURLList(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("show the url list")
+}
+
+func (u *URL) HelloHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprintf(w, `create new url page`)
 }
