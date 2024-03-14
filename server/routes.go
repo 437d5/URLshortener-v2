@@ -6,25 +6,28 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/437d5/URLshortener-v2/db"
 	"github.com/437d5/URLshortener-v2/handlers"
 )
 
-func newRoutes() *chi.Mux {
+func (a *App) newRoutes() {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
 
-	router.Route("/urls", loadRoutes)
+	router.Route("/urls", a.loadRoutes)
 
-	return router
+	a.router = router
 }
 
-func loadRoutes(router chi.Router) {
-	urlHandler := &handlers.URL{}
+func (a *App) loadRoutes(router chi.Router) {
+	urlHandler := &handlers.URL{
+		Repo: &db.RedisRepo{
+			Client: a.rdb,
+		},
+	}
 
 	router.Get("/", urlHandler.HelloHandler)
-	// TODO: create url redo
-	router.Post("/create", urlHandler.CreateURL)
-	router.Get("/{id}", urlHandler.GetURL)
-	router.Delete("/{id}", urlHandler.DeleteURL)
+	router.Post("/", urlHandler.CreateURL)
+	router.Get("/{token}", urlHandler.GetURL)
 }
