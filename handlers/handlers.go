@@ -20,19 +20,16 @@ type URL struct {
 // CreateURL get FullURL and pass it to u.Repo.Create
 func (u *URL) CreateURL(w http.ResponseWriter, r *http.Request) {
 	var token = shortener.CreateToken(shortener.Alphabet, shortener.AlphabetLen, shortener.TokenLen)
+	var fullURL = r.FormValue("url")
 
-	var body struct {
-		FullURL string `json:"fullURL"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	return
+	// }
 	shorten := model.ShortenURL{
 		ID:      rand.Uint64(),
 		Token:   token,
-		FullURL: body.FullURL,
+		FullURL: fullURL,
 	}
 
 	err := u.Repo.Create(r.Context(), shorten)
@@ -49,10 +46,20 @@ func (u *URL) CreateURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusCreated)
 	if _, err := w.Write(res); err != nil {
 		fmt.Println("error while writing:", err)
 	}
+
+	responseHTML := `<h2>URL Shortener</h2> 
+	<p>The token we created: %s</p>
+	<p>The URL you gave: %s</p>
+	<p>Input the URL you want to be short.</p>
+	<form method="post" action="/urls">
+	<input type="text" name="url" placeholder="Enter a URL">
+	<input type="submit" value="Short"></form>`
+	fmt.Fprintf(w, responseHTML, shorten.Token, shorten.FullURL)
 }
 
 func (u *URL) GetURL(w http.ResponseWriter, r *http.Request) {
@@ -91,5 +98,10 @@ func (u *URL) DeleteURL(w http.ResponseWriter, r *http.Request) {
 
 func (u *URL) HelloHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, `create new url page`)
+	responseHTML := `<h2>URL Shortener</h2> 
+	<p>Input the URL you want to be short.</p>
+	<form method="post" action="/urls">
+	<input type="text" name="url" placeholder="Enter a URL">
+	<input type="submit" value="Short"></form>`
+	fmt.Fprintf(w, responseHTML)
 }

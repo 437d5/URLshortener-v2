@@ -5,7 +5,6 @@ go 1.21.7
 require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/redis/go-redis/v9 v9.5.1
-	golang.org/x/text v0.14.0
 )
 
 require (
