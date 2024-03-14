@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	//"golang.org/x/text/cases"
 )
 
 type App struct {
@@ -18,13 +17,13 @@ type App struct {
 
 func NewApp() *App {
 	app := &App{
-		router: newRoutes(),
+		// creating a new client to redis
 		rdb: redis.NewClient(&redis.Options{
-			Addr:     os.Getenv("REDIS_URL"),
+			Addr: os.Getenv("REDIS_URL"),
 			//Password: os.Getenv("REDIS_PASS"),
 		}),
 	}
-
+	app.newRoutes()
 	return app
 }
 
@@ -39,6 +38,7 @@ func (a *App) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to connect to redis: %w", err)
 	}
 
+	// close client
 	defer func() {
 		if err := a.rdb.Close(); err != nil {
 			fmt.Println("failed to close redis", err)
